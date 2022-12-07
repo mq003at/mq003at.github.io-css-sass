@@ -1,0 +1,278 @@
+@use "sass:map";
+
+// Color section
+$background-color: (
+    "dark": #252530,
+    "marine": #1423ff,
+    "apricot": #ffb469,
+);
+
+$font-color: (
+    "white": #fff
+);
+
+$font-style: (
+    "corben": "Corben",
+    "cursive": "Lobster",
+);
+
+
+// Styling template
+@mixin flex-wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+};
+
+@mixin flex-row ($justify, $align) {
+    display: flex;
+    flex-direction: column;
+    justify-content: $justify;
+    align-items: $align;
+}
+
+@mixin grid {
+    display: grid;
+    margin: auto;
+    gap: 10px;
+    width: 100%
+}
+
+@mixin background ($name, $brightness) {
+    background: linear-gradient(rgba(0, 0, 0, $brightness), rgba(0, 0, 0, $brightness)), url("../../assets/img/#{$name}");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+@mixin blend-background ($name, $brightness, $color) {
+    @include background($name, $brightness);
+    background-color: $color;
+    background-blend-mode:soft-light;
+}
+
+
+.boxxed {
+    border-radius: 25px;
+}
+
+// Font section
+
+
+// Main styling
+body {
+    background-color: map.get($background-color, "dark");
+    color: map.get($font-color, "white");
+    margin: 0;
+    padding: 0;
+    font-family: map.get($font-style, "corben");
+}
+
+p {
+    margin: 0;
+    &.outlined {
+        text-shadow: 1px 1px 0.04em map.get($background-color, "dark"), -1px -1px 0.04em map.get($background-color, "dark"); //Clarity, because my eyesight is terrible.
+    }
+}
+
+.reverse {
+    color: map.get($background-color, "dark");
+}
+
+.body-container {
+    padding-left: 5em;
+    padding-right: 5em;
+    text-align: center;
+}
+
+.flex-wrap {
+    @include flex-wrap;
+
+    &.header-nav {
+        margin-left: auto;
+        height: 100%;
+    }
+}
+
+.grid {
+    @include grid;
+
+    &.main-feature {
+        grid-template-areas: "one one two three" "one one four five";
+        grid-template-columns: 0.75fr 0.75fr 1fr 1fr;
+        grid-template-rows:  1fr 1fr;
+    }
+
+    padding-bottom: 1.5em;
+}
+
+.header-logo {
+    font-family: map.get($font-style, "cursive");
+    font-size: 2em;
+}
+
+nav {
+    font-size: 0.75em;
+}
+
+a {
+    color: map.get($font-color, "white");
+    padding: 0 0.5em;
+    text-decoration: none;
+}
+
+a:hover {
+    background-size: 0.5em;
+    background-repeat: no-repeat;
+    background-color: map.get($background-color, "dark");
+    background-position: top right;
+    animation: transitionalDot 0.1s ease-in;
+    animation-fill-mode: forwards;
+}
+
+// Title for each section
+.main-title {
+    font-size: 0.85em;
+    padding-bottom: 2em;
+    padding-top: 2em;
+}
+
+// Box styling
+.box {
+    text-align: left;
+    margin-top: 0.5em;
+    transition-duration: 220ms;
+}
+.box:hover {
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+}
+
+.category {
+    width: fit-content;
+    margin-right: 0.5em;
+    padding: 0em 1.2em;
+    font-size: 0.5em;
+    font-weight: bold;
+
+    &.reverse {
+        background-color:  map.get($background-color, "dark");
+        color: map.get($font-color, "white");
+    }
+    &.normal {
+        background-color: map.get($font-color, "white");
+        color: map.get($background-color, "dark")
+    }
+
+    & p{
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+}
+
+
+.box-content {
+    @include flex-row(flex-start, stretch);
+
+    margin: 1.25em 1.5em;
+    height: calc(100% - 1.25em*2);
+}
+
+// Content styling
+.category-wrap {
+    display: flex;
+    justify-content: flex-start;
+    height: 1.25em;
+    flex: 1;
+}
+
+.category {
+    height: inherit;
+}
+
+.content-title {
+    font-size: 1.8em;
+    font-weight: 900;
+    line-height: 140%;
+    &.small-text {
+        font-size: 1em;
+    }
+}
+
+.author {
+    font-size: 1em;
+    &.small-text {
+        font-size: 0.7em;
+    }
+}
+
+// Background Images
+.box {
+    &.one-space {
+        @include background("one-space.jpg", 0.15)
+    }
+    
+    &.make-open {
+        @include blend-background("make.jpg", 0 ,map.get($background-color, "marine"))
+    }
+    
+    &.none {
+        @include blend-background("", 0 ,map.get($background-color, "apricot"))
+    }
+    
+}
+// Animation
+@keyframes transitionalDot {
+    0% {
+        background-image: url("../../assets/img/light-circle.png");
+        background-size: 0;
+    }
+
+    100% {
+        background-image: url("../../assets/img/light-circle.png");
+        background-size: 0.5em;
+    }
+}
+
+// Grid section
+.grid div:nth-child(1) {
+    grid-area: one;
+}
+
+.grid> :nth-child(1)>.box-content {
+    
+}
+
+.grid div:nth-child(2) {
+    grid-area: two;
+}
+
+.grid> :nth-child(2)>.box {
+    background-color: orangered;
+}
+
+
+.grid div:nth-child(3) {
+    grid-area: three;
+}
+
+.grid> :nth-child(3)>.box {
+    background-color: greenyellow;
+}
+
+.grid div:nth-child(4) {
+    grid-area: four;
+}
+
+.grid> :nth-child(4)>.box {
+    background-color: teal;
+}
+
+.grid div:nth-child(5) {
+    grid-area: five;
+}
+
+.grid> :nth-child(5)>.box {
+    background-color: pink;
+}

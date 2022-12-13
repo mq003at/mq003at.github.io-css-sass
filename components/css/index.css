@@ -316,6 +316,10 @@ a:hover {
   outline: none;
 }
 
+.extras.grid {
+  padding-bottom: 4em;
+}
+
 footer {
   bottom: 0;
   text-align: left;

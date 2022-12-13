@@ -5,10 +5,17 @@ $background-color: (
     "dark": #252530,
     "marine": #1423ff,
     "apricot": #ffb469,
+    "eggplant": #77008f,
+    "cerise": #ff9ed8,
+    "accent": #ffb469,
+    "greydark": #3b3b44,
+    "thistle": #eebeff,
+
 );
 
 $font-color: (
-    "white": #fff
+    "white": #fff,
+    "dark": #252530,
 );
 
 $font-style: (
@@ -23,7 +30,9 @@ $font-style: (
     flex-direction: row;
     justify-content: center;
     align-items: center;
-};
+}
+
+;
 
 @mixin flex-row ($justify, $align) {
     display: flex;
@@ -39,8 +48,18 @@ $font-style: (
     width: 100%
 }
 
+@mixin category-box ($color, $background, $border) {
+    background-color: map.get($font-color, $background);
+    color: map.get($font-color, $color);
+
+    @if $border !="none" {
+        border: 1px solid map.get($font-color, $border);
+    }
+}
+
 @mixin background ($name, $brightness) {
-    background: linear-gradient(rgba(0, 0, 0, $brightness), rgba(0, 0, 0, $brightness)), url("../../assets/img/#{$name}");
+    background: linear-gradient(rgba(0, 0, 0, $brightness), rgba(0, 0, 0, $brightness)),
+    url("../../assets/img/#{$name}");
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -48,16 +67,13 @@ $font-style: (
 @mixin blend-background ($name, $brightness, $color) {
     @include background($name, $brightness);
     background-color: $color;
-    background-blend-mode:soft-light;
+    background-blend-mode: soft-light;
 }
 
 
 .boxxed {
     border-radius: 25px;
 }
-
-// Font section
-
 
 // Main styling
 body {
@@ -70,6 +86,7 @@ body {
 
 p {
     margin: 0;
+
     &.outlined {
         text-shadow: 1px 1px 0.04em map.get($background-color, "dark"), -1px -1px 0.04em map.get($background-color, "dark"); //Clarity, because my eyesight is terrible.
     }
@@ -85,6 +102,10 @@ p {
     text-align: center;
 }
 
+header {
+    margin-top: 3em;
+}
+
 .flex-wrap {
     @include flex-wrap;
 
@@ -94,13 +115,31 @@ p {
     }
 }
 
+.sidebar {
+    position: fixed;
+    top: calc(50vh - 5ch);
+    left: 2.5em;
+    writing-mode: vertical-lr;
+    font-size: 0.8em;
+    text-align: center;
+    transform: rotate(180deg)
+}
+
 .grid {
     @include grid;
 
     &.main-feature {
         grid-template-areas: "one one two three" "one one four five";
         grid-template-columns: 0.75fr 0.75fr 1fr 1fr;
-        grid-template-rows:  1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    &.extras {
+        height: 90vh;
+        padding-top: 1.5em;
+        grid-template-areas: "one one one two two two" "three three four four five five";
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 2fr 1.5fr;
     }
 
     padding-bottom: 1.5em;
@@ -142,10 +181,20 @@ a:hover {
     text-align: left;
     margin-top: 0.5em;
     transition-duration: 220ms;
-}
-.box:hover {
-    margin-top: 0em;
-    margin-bottom: 0.5em;
+    animation: imageSize-out 0.2s ease-out;
+
+    &:hover {
+        cursor: pointer;
+        margin-top: 0em;
+        margin-bottom: 0.5em;
+
+        &.other {
+            animation: imageSize-in 0.2s ease-in;
+            animation-fill-mode: forwards;
+            margin-top: 0.5em;
+            margin-bottom: 0;
+        }
+    }
 }
 
 .category {
@@ -156,15 +205,30 @@ a:hover {
     font-weight: bold;
 
     &.reverse {
-        background-color:  map.get($background-color, "dark");
-        color: map.get($font-color, "white");
-    }
-    &.normal {
-        background-color: map.get($font-color, "white");
-        color: map.get($background-color, "dark")
+        @include category-box("white", "dark", "none")
     }
 
-    & p{
+    &.normal {
+        @include category-box("dark", "white", "none")
+    }
+
+    &.transparent {
+        @include category-box("white", "none", "white");
+
+        &:hover {
+            @include category-box("dark", "white", "white");
+        }
+    }
+
+    &.transparent-reverse {
+        @include category-box("dark", "none", "dark");
+
+        &:hover {
+            @include category-box("white", "dark", "dark");
+        }
+    }
+
+    & p {
         height: 100%;
         display: flex;
         align-items: center;
@@ -175,8 +239,17 @@ a:hover {
 .box-content {
     @include flex-row(flex-start, stretch);
 
-    margin: 1.25em 1.5em;
+    padding: 1.25em 1.5em;
     height: calc(100% - 1.25em*2);
+
+    &.other {
+        justify-content: center;
+        padding: 1em 4em;
+    }
+
+    &.extras {
+        justify-content: center;
+    }
 }
 
 // Content styling
@@ -185,6 +258,10 @@ a:hover {
     justify-content: flex-start;
     height: 1.25em;
     flex: 1;
+
+    &.other, &.extras {
+        flex: 0;
+    }
 }
 
 .category {
@@ -195,16 +272,184 @@ a:hover {
     font-size: 1.8em;
     font-weight: 900;
     line-height: 140%;
+    display: inline-block;
+    transition-duration: 0.2s;
+
     &.small-text {
         font-size: 1em;
     }
+
+    &.other {
+        font-size: 2.7em;
+        padding: 0.5em 0;
+        content: "→";
+
+    }
+
+    &.other p:hover::after, &.extras p:hover::after {
+        content: "    →";
+    }
+
+    &.extras {
+        font-size: 2.3em;
+        padding: 0.6em 0;
+    }
+
 }
 
 .author {
     font-size: 1em;
+
     &.small-text {
         font-size: 0.7em;
     }
+
+}
+
+.content-description {
+    padding-top: 0.4em;
+    padding-bottom: 1.8em;
+    font-size: 1.2em;
+    font-weight: bold;
+
+    &.extras {
+        font-size: 1em;
+    }
+}
+
+.special {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    border: 1px solid #000000;
+    border-right: 0;
+    border-top: 0;
+    border-image: linear-gradient(to right, transparent 0px, transparent 0.02em, #000 0.02em, #000 2em, transparent 2em, transparent 100%) 100% 1;
+}
+
+// Other section
+.main-other-wrap {
+    height: 500px;
+    padding-bottom: 2em;
+}
+
+.box.other {
+    height: inherit;
+}
+
+.loadmore {
+    background-color: map.get($background-color, "greydark");
+    padding: 1.1em 0;
+    transition: 0.2s;
+
+    &:hover {
+        background-color: map.get($background-color, "accent");
+        cursor: pointer;
+    }
+
+    & p {
+        letter-spacing: 0.1em;
+    }
+}
+
+.subscription {
+    text-align: -webkit-center;
+    padding-bottom: 10em;
+    padding-top: 5em;
+
+    .title {
+        width: 50%;
+        font-size: 2.5em;
+        font-weight: bold;
+        line-height: 1em;
+        padding-bottom: 0.7em;
+    }
+
+    .sub {
+        display: inline-flex;
+        font-size: 1.2em;
+        font-weight: bold;
+        padding-bottom: 3em;
+
+        p {
+            margin-right: 0.25em;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typewriter 6s steps(25, end) infinite,
+        }
+
+        span {
+            animation: blink 1s linear infinite;
+        }
+    }
+
+    .button-wrap {
+        @extend .loadmore;
+        width: 10em;
+        transition-duration: 0.2s;
+
+        &:hover {
+            width: 12em;
+        }
+    }
+}
+
+.email-input {
+    .field {
+        font-size: 1.25em;
+        width: 25%;
+        height: 30px;
+        margin: 20px auto 30px;
+        padding: 6px 9px;
+        text-align: center;
+        word-break: normal;
+        border: hidden;
+        color: map.get($font-color, "white");
+        font-family: map.get($font-style, "corben");
+        background: map.get($background-color, "dark");
+        border-bottom: 1px solid map.get($background-color, "accent");
+        transition-duration: 0.5s;
+
+        &:focus {
+            width: 35%;
+            outline: none;
+        }
+    }
+}
+
+// Extras section
+
+
+// Footer section
+footer {
+    bottom: 0;
+    text-align: left;
+
+    .wrap {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    nav a:nth-child(1) {
+        padding-left: 0;
+    }
+
+    .contact-us {
+        margin-left: auto;
+    }
+
+    .copyright {
+        padding-bottom: 1.7em;
+        padding-top: 0.65em;
+        font-size: 0.65em;
+        width: 100%;
+    }
+}
+
+svg {
+    height: 1em;
+    width: 1em;
+    fill: map.get($font-color, "white");
 }
 
 // Background Images
@@ -212,16 +457,48 @@ a:hover {
     &.one-space {
         @include background("one-space.jpg", 0.15)
     }
-    
+
     &.make-open {
-        @include blend-background("make.jpg", 0 ,map.get($background-color, "marine"))
+        @include blend-background("make.jpg", 0, map.get($background-color, "marine"))
     }
-    
+
     &.none {
-        @include blend-background("", 0 ,map.get($background-color, "apricot"))
+        @include blend-background("", 0, map.get($background-color, "apricot"))
     }
-    
+
+    &.comfortable {
+        @include blend-background("comfortable.jpg", 0, map.get($background-color, "eggplant"))
+    }
+
+    &.helm {
+        @include blend-background("helm.jpg", 0, map.get($background-color, "cerise"))
+    }
+
+    &.best {
+        @include blend-background("best.jpg", 0, map.get($background-color, "accent"))
+    }
+
+    &.trick {
+        @include background("trick.jpg", 0.15)
+    }
+
+    &.stop-sign {
+        @include blend-background("stop-sign.jpg", 0.005, map.get($background-color, "thistle"))
+    }
+
+    &.quiet {
+        @include blend-background("quiet.jpg", 0.005, map.get($background-color, "accent"))
+    }
+
+    &.unique {
+        @include background("unique.jpg", 0.15)
+    }
+
+    &.change {
+        @include background("change.jpg", 0.25)
+    }
 }
+
 // Animation
 @keyframes transitionalDot {
     0% {
@@ -235,14 +512,54 @@ a:hover {
     }
 }
 
+@keyframes imageSize-in {
+    0% {
+        background-size: 100%;
+    }
+
+    100% {
+        background-size: 102%;
+    }
+}
+
+@keyframes imageSize-out {
+    0% {
+        background-size: 102%;
+    }
+
+    100% {
+        background-size: 100%;
+    }
+}
+
+@keyframes typewriter {
+    0% {
+        width: 0
+    }
+
+    60%,
+    70% {
+        width: 17ch;
+    }
+
+    90%,
+    100% {
+        width: 0;
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0
+    }
+}
+
 // Grid section
 .grid div:nth-child(1) {
     grid-area: one;
 }
 
-.grid> :nth-child(1)>.box-content {
-    
-}
+.grid> :nth-child(1)>.box-content {}
 
 .grid div:nth-child(2) {
     grid-area: two;
